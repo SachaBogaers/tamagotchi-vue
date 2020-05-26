@@ -1,3 +1,5 @@
 module.exports = {
-	publicPath: 'tamagotchi-vue'
+	publicPath: process.env.NODE_ENV === 'production'
+    ? '/food/'
+    : '/'
 }
