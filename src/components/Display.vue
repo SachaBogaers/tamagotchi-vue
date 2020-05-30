@@ -7,6 +7,7 @@
 			:sleepiness="cow.sleepiness"
 			:speed="cow.speed"
 			:neediness="cow.neediness"
+			:outfit="cow.outfit"
 			:command="command">
 		</Tamagotchi>
   </div>
@@ -23,12 +24,42 @@ export default {
 	data () {
 		return {
 			cows: [
-				{name: 'Billy', active: true, sleepiness: 5, speed: 7, size: 1, neediness: 2},
-				{name: 'Madeliefje', active: true, sleepiness:0, speed: 10, size: 1, neediness: 8},
-				{name: 'Ellie', active: true, sleepiness: 6, speed: 5, size: 1, neediness: 10},
-				{name: 'Tommie', active: true, sleepiness: 2, speed: 8, size: 1, neediness: 10},
-				{name: 'Pieter', active: true, sleepiness: 0.5, speed: 4, size: 1, neediness: 4},
-				{name: 'Anna', active: true, sleepiness: 10, speed: 3, size: 2, neediness: 1}
+				{
+					name: 'Cowboy Billy Boem', active: true, sleepiness: 5, speed: 7, size: 1, neediness: 2,
+					outfit: {
+						hat: 'cowboy'
+					}
+				},
+				{
+					name: 'Mawiefje', active: true, sleepiness:0, speed: 10, size: 1, neediness: 8,
+					outfit: {
+						hat: ''
+					}
+				},
+				{
+					name: 'Ellie de Scheve', active: true, sleepiness: 6, speed: 5, size: 1, neediness: 10,
+					outfit: {
+						hat: ''
+					}
+				},
+				{
+					name: 'TomTomTommie', active: true, sleepiness: 2, speed: 8, size: 1, neediness: 10,
+					outfit: {
+						hat: 'cowboy'
+					}
+				},
+				{
+					name: 'Pietertje', active: true, sleepiness: 0.5, speed: 4, size: 1, neediness: 4,
+					outfit: {
+						hat: 'cowboy'
+					}
+				},
+				{
+					name: 'SUPERAnna', active: true, sleepiness: 10, speed: 3, size: 2, neediness: 1,
+					outfit: {
+						hat: ''
+					}
+				}
 			],
 			command: ''
 		}
@@ -54,9 +85,10 @@ export default {
 	width: 100%;
 	height: 100%;
 	padding-bottom: 35px;
-	background: #00F260;  /* fallback for old browsers */
-	background: -webkit-linear-gradient(to bottom, #0575E6, #00F260);  /* Chrome 10-25, Safari 5.1-6 */
-	background: linear-gradient(to bottom, #0575E6, #00F260); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+	background: url('../assets/grass.png')
+	/* background: #00F260;  /* fallback for old browsers */
+	/* background: -webkit-linear-gradient(to bottom, #0575E6, #00F260);  /* Chrome 10-25, Safari 5.1-6 */
+	/* background: linear-gradient(to bottom, #0575E6, #00F260); W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
 
 </style>
