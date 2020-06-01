@@ -3,13 +3,15 @@
 			<div class="list__cow" v-for="cow in cows" :key="cow.name">
 				<p class="list__cow__name">{{cow.name}}</p>
 				<p>Hunger:</p>
-				<img src="@/assets/hearts/fullHeart.png" v-for="n in hearts(cow.hunger).fullHearts" :key="n">
+				{{cow.hunger}}
+				<!-- <img src="@/assets/hearts/fullHeart.png" v-for="n in hearts(cow.hunger).fullHearts" :key="n">
 				<img src="@/assets/hearts/halfFullHeart.png" v-if="hearts(cow.hunger).halfFullHearts">
-				<img src="@/assets/hearts/emptyHeart.png" v-for="n in hearts(cow.hunger).emptyHearts" :key="n">
+				<img src="@/assets/hearts/emptyHeart.png" v-for="n in hearts(cow.hunger).emptyHearts" :key="n"> -->
 				<p>Happiness:</p>
-				<img src="@/assets/hearts/fullHeart.png" v-for="n in hearts(cow.happiness).fullHearts" :key="n">
+				{{cow.happiness}}
+				<!-- <img src="@/assets/hearts/fullHeart.png" v-for="n in hearts(cow.happiness).fullHearts" :key="n">
 				<img src="@/assets/hearts/halfFullHeart.png" v-if="hearts(cow.happiness).halfFullHearts">
-				<img src="@/assets/hearts/emptyHeart.png" v-for="n in hearts(cow.happiness).emptyHearts" :key="n">
+				<img src="@/assets/hearts/emptyHeart.png" v-for="n in hearts(cow.happiness).emptyHearts" :key="n"> -->
 			</div>
   </div>
 </template>
