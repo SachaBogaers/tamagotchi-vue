@@ -1,23 +1,29 @@
 <template>
-	<div @click="petCow"  
+	<div  
 		class="tamagotchi" 
 		ref="tamagotchi" 
 		:style="{left: this.x + '%', top: this.y + '%'}">
 		<div
 			class="tamagotchi__display"
 			:class="{'tamagotchi__display--flipped': direction=='right'}">
-			<div 
+			<div
+				@click="petCow"  
 				class="tamagotchi__display__cow"
-				:class="{'tamagotchi__display__cow--walking': walking}">
-				<img 
+				:class="{'tamagotchi__display__cow--walking': walking}"
+				:style="{'animation-duration': bounceSpeed + 's'}">
+				<img
 					class="tamagotchi__display__img" 
 					:src="image"/>
-				<img v-if="outfit.hat" class="outfit hat" :src="hatImage"/>
+				<img v-if="outfit.hat" class="outfit hat" :src="hatImage" :style="hatLocation"/>
+				<img v-if="outfit.glasses" class="outfit glasses" :src="glassesImage"/>
 			</div>
 		</div>
 		<p>{{name}}</p>
 		<p>Happiness: {{happiness}}</p>
 		<p>Status: {{status}}</p>
+		<p>Hunger: {{hunger}}</p>
+		<button @click="feedCow" type="button">Feed</button>
+		<button @click="hugCow" type="button">Hug</button>
 	</div>
 </template>
 
@@ -30,12 +36,13 @@ export default {
 		sleepiness: Number,
 		speed: Number,
 		neediness: Number,
-		outfit: Object
+		appetite: Number,
+		outfit: Object,
+		happiness: Number,
+		hunger: Number
 	},
 	data () {
 		return {
-			happiness: 20,
-			status: 'neutral',
 			// left: 50,
 			// top: 50,
 			x: 80*Math.random(),
@@ -53,33 +60,21 @@ export default {
 	},
 	methods: {
 		petCow() {
-			this.happiness = this.happiness + 5
-			this.updateStatus()
+			this.$emit('modifyStats', 'happiness', 5, this.name)
 		},
-		// updateStats () {
-		// 	this.happiness = Math.max(0, this.happiness - 1)
-
-		// 	setTimeout(() => { this.updateStats() }, 1500)
-		// },
-		updateStatus () {
-			if (this.happiness > 15) {
-				this.status = 'superHappy'
-			} else if (this.happiness > 7) {
-				this.status = 'happy'
-			} else if (this.hgappiness > 4) {
-				this.status = 'neutral'
-			} else if (this.happiness > 0) {
-				this.status = 'sad'
-			} else {
-				this.status = 'dead'
-			}
+		hugCow() {
+			this.$emit('modifyStats', 'happiness', 10, this.name)
+		},
+		feedCow() {
+			this.$emit('modifyStats', 'hunger', 10, this.name)
 		},
 		walk () {
 			if (this.status != 'dead') {
-				let x = this.x + (20*Math.random()- 10)
+				let range = 2*this.speed + 5
+				let x = this.x + (2 * range * Math.random() - range)
 				x = Math.max(0, x)
 				x = Math.min(80, x)
-				let y = this.y + (20*Math.random()- 10)
+				let y = this.y + (2 * range * Math.random() - range)
 				y = Math.max(0, y)
 				y = Math.min(80, y)
 				if (x > this.x) {
@@ -93,7 +88,7 @@ export default {
 				this.y = y
 				setTimeout(() => this.walking = false, 2000)
 			}
-			setTimeout(this.walk, 5000*Math.random() + 2000)
+			setTimeout(this.walk, (this.sleepiness*1000)*Math.random() + 2000)
 		},
 		walkGsap () {
 		const { tamagotchi } = this.$refs
@@ -101,24 +96,53 @@ export default {
 		}
 	},
 	computed: {
+		status () {
+			let status = ""
+			if (this.hunger ==  0) {
+				status = 'dead'
+			} else {
+				if (this.happiness > 80) {
+					status = 'superHappy'
+				} else if (this.happiness > 50) {
+					status = 'happy'
+				} else if (this.happiness > 20) {
+					status = 'neutral'
+				} else {
+					status = 'sad'
+				} 
+			}
+			return status
+		},
 		image () {
 			let image_name = this.status + 'Cow'
 			let image = require('../assets/' + image_name + '.png')
 			return image
 		},
 		hatImage () {
-			let image_name = this.outfit.hat
+			let image_name = this.outfit.hat.name
 			let image = require('../assets/hats/' + image_name + '.png')
 			return image
+		},
+		hatLocation () {
+			let hatLocation = {
+				left: 'calc(100% * (' + this.outfit.hat.left + '/24))',
+				top: 'calc(100% * (' + this.outfit.hat.top + '/15))'
+			}
+			return hatLocation
+		},
+		glassesImage () {
+			let image_name = this.outfit.glasses
+			let image = require('../assets/glasses/' + image_name + '.png')
+			return image
+		},
+		bounceSpeed () {
+			let bounceSpeed = 0
+			if (this.walking) bounceSpeed = this.status == 'sad' ? 0.2 : 0.1
+			else if (!['dead', 'sad'].includes(this.status)) bounceSpeed = 0.5
+			return bounceSpeed
 		}
 	},
 	mounted () {
-		this.updateStatus()
-		setInterval(() => {
-			this.happiness = Math.max(0, this.happiness - 1)
-			this.updateStatus()
-		}, 1000 + (11 - this.neediness) * 300)
-		// this.updateStats()
 		setTimeout(this.walk, Math.random()*3000 + 2000)
 	}
 }
@@ -139,18 +163,18 @@ export default {
 			transform: scaleX(-1);
 		}
 	.tamagotchi__display__cow {
-		animation: bounce 0.5s infinite alternate;
+		animation: bounce infinite alternate;
 		position: relative;
 	}
 		.tamagotchi__display__cow .outfit{
 			position: absolute;
 		}
-		.tamagotchi__display__cow .hat {
-			top: -33.333%;
-			left: -4.167%;
+		.tamagotchi__display__cow .glasses {
+			top: calc(100% * (4 / 15));
+			left: calc(100% * (3 / 24));
 		}
 		.tamagotchi__display__cow--walking {
-			animation: bounce 0.1s infinite alternate;
+			/* animation: bounce 0.2s infinite alternate; */
 		}
 		.tamagotchi__display__img {
 			display: block;
