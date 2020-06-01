@@ -30,7 +30,7 @@ export default {
 			cows: [
 				{
 					name: 'Cowboy Billy Boem', active: true, sleepiness: 5, speed: 7, size: 1, neediness: 2, appetite: 7, stubbornness: 7,
-					happiness: 100, hunger: 100,
+					happiness: 100, hunger: 100, energy: 100,
 					outfit: {
 						hat: {
 							name: 'cowboy',
@@ -41,7 +41,7 @@ export default {
 				},
 				{
 					name: 'Mawiefje', active: true, sleepiness: 0.5, speed: 10, size: 1, neediness: 8, appetite: 10, stubbornness: 3,
-					happiness: 100, hunger: 100,
+					happiness: 100, hunger: 100, energy: 100,
 					outfit: {
 						hat: {
 							name: 'cowboy',
@@ -53,35 +53,35 @@ export default {
 				},
 				{
 					name: 'Ellie de Scheve', active: true, sleepiness: 7, speed: 5, size: 1, neediness: 10, appetite: 6, stubbornness: 6,
-					happiness: 100, hunger: 100,
+					happiness: 100, hunger: 100, energy: 100,
 					outfit: {
 						hat: ''
 					}
 				},
 				{
 					name: 'TomTomTommie', active: true, sleepiness: 4, speed: 8, size: 1, neediness: 10, appetite: 9, stubbornness: 4,
-					happiness: 100, hunger: 100,
+					happiness: 100, hunger: 100, energy: 100,
 					outfit: {
 						hat: ''
 					}
 				},
 				{
 					name: 'Pietertje', active: true, sleepiness: 3, speed: 4, size: 1, neediness: 4, appetite: 4, stubbornness: 2,
-					happiness: 100, hunger: 100,
+					happiness: 100, hunger: 100, energy: 100,
 					outfit: {
 						hat: ''
 					}
 				},
 				{
 					name: 'SUPERAnna', active: true, sleepiness: 10, speed: 3, size: 2, neediness: 1, appetite: 2, stubbornness: 1,
-					happiness: 100, hunger: 100,
+					happiness: 100, hunger: 100, energy: 100,
 					outfit: {
 						hat: ''
 					}
 				},
 				{
 					name: 'Jochem', active: true, sleepiness: 0, speed: 3, size: 2, neediness: 10, appetite: 8, stubbornness: 9,
-					happiness: 100, hunger: 100,
+					happiness: 100, hunger: 100, energy: 100,
 					outfit: {
 						hat: '',
 						glasses: 'sunglasses'
@@ -117,6 +117,7 @@ export default {
 		this.cows.forEach((cow) => {
 			cow.happiness = 80
 			cow.hunger = 80
+			cow.energy = 80
 		})
 	}
 }

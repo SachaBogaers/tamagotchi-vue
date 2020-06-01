@@ -24,7 +24,7 @@
 		{{listenProbability}}
 		<button @click="feedCow" type="button">Feed</button>
 		<button @click="hugCow" type="button">Hug</button>
-		<button @click="salto" type="button">salto</button>
+		<button @click="salto" type="button">Salto</button>
 	</div>
 </template>
 
@@ -52,7 +52,8 @@ export default {
 			direction: 'left',
 			walking: false,
 			jumping: false,
-			saltoing: false
+			saltoing: false,
+			action: ''
 		}
 	},
 	watch: {

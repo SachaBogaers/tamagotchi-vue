@@ -3,15 +3,14 @@
 			<div class="list__cow" v-for="cow in cows" :key="cow.name">
 				<p class="list__cow__name">{{cow.name}}</p>
 				<p>Hunger:</p>
-				{{cow.hunger}}
-				<!-- <img src="@/assets/hearts/fullHeart.png" v-for="n in hearts(cow.hunger).fullHearts" :key="n">
+				<img src="@/assets/hearts/fullHeart.png" v-for="n in hearts(cow.hunger).fullHearts" :key="'hap_full' + cow.name + n">
 				<img src="@/assets/hearts/halfFullHeart.png" v-if="hearts(cow.hunger).halfFullHearts">
-				<img src="@/assets/hearts/emptyHeart.png" v-for="n in hearts(cow.hunger).emptyHearts" :key="n"> -->
+				<img src="@/assets/hearts/emptyHeart.png" v-for="n in hearts(cow.hunger).emptyHearts" :key="'hap_empty' + cow.name + n">
 				<p>Happiness:</p>
-				{{cow.happiness}}
-				<!-- <img src="@/assets/hearts/fullHeart.png" v-for="n in hearts(cow.happiness).fullHearts" :key="n">
+				<img src="@/assets/hearts/fullHeart.png" v-for="n in hearts(cow.happiness).fullHearts" :key="'hun_full' + cow.name + n">
 				<img src="@/assets/hearts/halfFullHeart.png" v-if="hearts(cow.happiness).halfFullHearts">
-				<img src="@/assets/hearts/emptyHeart.png" v-for="n in hearts(cow.happiness).emptyHearts" :key="n"> -->
+				<img src="@/assets/hearts/emptyHeart.png" v-for="n in hearts(cow.happiness).emptyHearts" :key="'hun_empty' + cow.name + n">
+				{{cow.energy}}
 			</div>
   </div>
 </template>
@@ -35,7 +34,6 @@ export default {
 	methods: {
 		hearts (statValue) {
 			const heartScale = Math.round(statValue/10)
-			console.log("TEST")
 			let hearts = {
 				fullHearts: Math.floor(heartScale/2),
 				halfFullHearts: heartScale % 2,
