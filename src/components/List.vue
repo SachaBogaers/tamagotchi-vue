@@ -10,7 +10,7 @@
 				<img src="@/assets/hearts/fullHeart.png" v-for="n in hearts(cow.happiness).fullHearts" :key="'hun_full' + cow.name + n">
 				<img src="@/assets/hearts/halfFullHeart.png" v-if="hearts(cow.happiness).halfFullHearts">
 				<img src="@/assets/hearts/emptyHeart.png" v-for="n in hearts(cow.happiness).emptyHearts" :key="'hun_empty' + cow.name + n">
-				{{cow.energy}}
+				<p>Energy: {{cow.energy}}</p>
 			</div>
   </div>
 </template>
@@ -57,7 +57,7 @@ export default {
 	position: absolute;
 	height: 90%;
 	right: 0;
-	background-color: yellow;
+	background-color: beige;
 	width: 10%;
 	color: black;
 	padding: 10px;

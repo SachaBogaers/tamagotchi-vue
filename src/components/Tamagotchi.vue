@@ -35,13 +35,13 @@ export default {
 	props: {
 		name: String,
 		sleepiness: Number,
-		speed: Number,
-		neediness: Number,
 		appetite: Number,
 		stubbornness: Number,
 		outfit: Object,
 		happiness: Number,
-		hunger: Number
+		hunger: Number,
+		energy: Number,
+		personality: Object
 	},
 	data () {
 		return {
@@ -61,6 +61,11 @@ export default {
 			if (newStatus == 'dead') {
 				this.walking = false
 			}
+		},
+		energy: function(energy) {
+			if (energy == 0 && this.action != 'sleeping') {
+				this.sleep()
+			}
 		}
 	},
 	methods: {
@@ -69,14 +74,14 @@ export default {
 		},
 		hugCow() {
 			this.$emit('modifyStats', 'happiness', 10, this.name)
-			this.jump()
+			this.jump(false)
 		},
 		feedCow() {
 			this.$emit('modifyStats', 'hunger', 10, this.name)
 		},
 		walk () {
-			if (this.status != 'dead' && !this.saltoing) {
-				let range = 2*this.speed + 5
+			if (this.status != 'dead' && !this.saltoing && !['sleeping'].includes(this.action)) {
+				let range = 2*this.personality.speed + 5
 				let x = this.x + (2 * range * Math.random() - range)
 				x = Math.max(0, x)
 				x = Math.min(80, x)
@@ -96,10 +101,11 @@ export default {
 			}
 			setTimeout(this.walk, (this.sleepiness*1000)*Math.random() + 2000)
 		},
-		jump () {
+		jump (costsEnergy=true) {
 			if (!this.jumping && this.status != 'dead') {
 				if (this.listens()) {
 					this.jumping = true
+					if (costsEnergy) this.$emit('modifyStats', 'energy', -5, this.name)
 					setTimeout(() => this.jumping = false, this.animationDuration * 1000)
 				}
 			}
@@ -108,13 +114,24 @@ export default {
 			if (!this.saltoing && !this.jumping && this.status != 'dead') {
 				if (this.listens()) {
 					this.saltoing = true
+					this.$emit('modifyStats', 'energy', -10, this.name)
 					setTimeout(() => this.saltoing = false, this.animationDuration * 1000)
 				}
 			}
 		},
+		sleep () {
+			this.action = 'sleeping'
+			var sleepInterval = setInterval(() => {
+				this.$emit('modifyStats', 'energy', 1, this.name)
+				if (this.energy >= 80) {
+					clearInterval(sleepInterval)
+					this.action = ''
+				}
+			}, 150 + this.sleepiness * 25)
+		},
 		walkGsap () {
 		const { tamagotchi } = this.$refs
-		gsap.to(tamagotchi, {repeat: -1, delay: this.sleepiness, duration: 11 - this.speed, left: "+=random(-20, 20)%" , top: '+=random(-20, 20)%', repeatRefresh: true})
+		gsap.to(tamagotchi, {repeat: -1, delay: this.sleepiness, duration: 11 - this.personality.speed, left: "+=random(-20, 20)%" , top: '+=random(-20, 20)%', repeatRefresh: true})
 		},
 		listens () {
 			return Math.random() < this.listenProbability
@@ -144,7 +161,11 @@ export default {
 			return status
 		},
 		image () {
-			let image_name = this.status + 'Cow'
+			let image_name = this.status
+			if (this.status == 'dead') {
+				image_name = 'dead'
+			} else if (this.action == 'sleeping') image_name = 'sleeping'
+			image_name += 'Cow'
 			let image = require('../assets/' + image_name + '.png')
 			return image
 		},
@@ -167,6 +188,8 @@ export default {
 		},
 		animationDuration () {
 			let animationDuration = 0
+			if (this.action == 'sleeping')
+				return animationDuration
 			if (this.jumping) {
 				animationDuration = 0.4
 			} else if (this.saltoing) {
@@ -199,6 +222,7 @@ export default {
 	transition: left 2s ease-in-out, top 2s ease-in-out;
 	color: white;
 	font-weight: 700;
+  text-align: center;
 }
 	.tamagotchi__display {
 		position: relative;
