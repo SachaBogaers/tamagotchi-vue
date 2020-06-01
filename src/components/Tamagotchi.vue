@@ -20,9 +20,8 @@
 			</div>
 		</div>
 		<p>{{name}}</p>
-		<p>Happiness: {{happiness}}</p>
 		<p>Status: {{status}}</p>
-		<p>Hunger: {{hunger}}</p>
+		{{listenProbability}}
 		<button @click="feedCow" type="button">Feed</button>
 		<button @click="hugCow" type="button">Hug</button>
 		<button @click="salto" type="button">salto</button>
@@ -39,6 +38,7 @@ export default {
 		speed: Number,
 		neediness: Number,
 		appetite: Number,
+		stubbornness: Number,
 		outfit: Object,
 		happiness: Number,
 		hunger: Number
@@ -97,19 +97,26 @@ export default {
 		},
 		jump () {
 			if (!this.jumping && this.status != 'dead') {
-				this.jumping = true
-				setTimeout(() => this.jumping = false, this.animationDuration * 1000)
+				if (this.listens()) {
+					this.jumping = true
+					setTimeout(() => this.jumping = false, this.animationDuration * 1000)
+				}
 			}
 		},
 		salto () {
 			if (!this.saltoing && !this.jumping && this.status != 'dead') {
-				this.saltoing = true
-				setTimeout(() => this.saltoing = false, this.animationDuration * 1000)
+				if (this.listens()) {
+					this.saltoing = true
+					setTimeout(() => this.saltoing = false, this.animationDuration * 1000)
+				}
 			}
 		},
 		walkGsap () {
 		const { tamagotchi } = this.$refs
 		gsap.to(tamagotchi, {repeat: -1, delay: this.sleepiness, duration: 11 - this.speed, left: "+=random(-20, 20)%" , top: '+=random(-20, 20)%', repeatRefresh: true})
+		},
+		listens () {
+			return Math.random() < this.listenProbability
 		}
 	},
 	computed: {
@@ -117,7 +124,12 @@ export default {
 			let status = ""
 			if (this.hunger ==  0) {
 				status = 'dead'
-			} else {
+			} else if (this.hunger < 15) {
+				status = 'starving'
+			} else if (this.hunger < 30) {
+				status = 'grumpy'
+			}
+			else {
 				if (this.happiness > 80) {
 					status = 'superHappy'
 				} else if (this.happiness > 50) {
@@ -163,6 +175,13 @@ export default {
 				else if (!['dead', 'sad'].includes(this.status)) animationDuration = 0.5
 			}
 			return animationDuration
+		},
+		listenProbability () {
+			let statPercentage = (this.happiness + this.hunger) / 200
+			let listenProbability = (0.2 + 0.6 * statPercentage) + (0.8 - 0.6 * statPercentage) * (11 - this.stubbornness) / 10
+			// Round to two decimals
+			listenProbability = Math.round(listenProbability * 100) / 100
+			return listenProbability
 		}
 	},
 	mounted () {

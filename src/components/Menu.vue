@@ -1,9 +1,9 @@
 <template>
   <div id="menu">
-		<button @click="salto" type="button">Salto</button>
-		<button @click="hug" type="button">Hug</button>
-		<button @click="feed" type="button">Feed</button>
-		<button @click="jump" type="button">Jump</button>
+		<button class="button" @click="salto" type="button">Salto</button>
+		<button class="button" @click="hug" type="button">Hug</button>
+		<button class="button" @click="feed" type="button">Feed</button>
+		<button class="button" @click="jump" type="button">Jump</button>
   </div>
 </template>
 
@@ -48,9 +48,13 @@ export default {
   text-align: center;
 	position: absolute;
 	width: 100%;
-	background-color: brown;
+	background: url('../assets/wood.png');
 	bottom: 0;
 	height: 10%;
+}
+.button {
+	padding: 15px;
+	margin: 10px;
 }
 
 </style>

@@ -7,24 +7,29 @@
 		<Menu 
 			@modifyStats="modifyStats"
 		/>
+		<List 
+			:cows="cows"
+		/>
   </div>
 </template>
 
 <script>
 import Display from './components/Display.vue'
 import Menu from './components/Menu.vue'
+import List from './components/List.vue'
 
 export default {
   name: 'App',
   components: {
 		Display,
-		Menu
+		Menu,
+		List
 	},
 	data () {
 		return {
 			cows: [
 				{
-					name: 'Cowboy Billy Boem', active: true, sleepiness: 5, speed: 7, size: 1, neediness: 2, appetite: 7,
+					name: 'Cowboy Billy Boem', active: true, sleepiness: 5, speed: 7, size: 1, neediness: 2, appetite: 7, stubbornness: 7,
 					happiness: 100, hunger: 100,
 					outfit: {
 						hat: {
@@ -35,7 +40,7 @@ export default {
 					}
 				},
 				{
-					name: 'Mawiefje', active: true, sleepiness: 0.5, speed: 10, size: 1, neediness: 8, appetite: 10,
+					name: 'Mawiefje', active: true, sleepiness: 0.5, speed: 10, size: 1, neediness: 8, appetite: 10, stubbornness: 3,
 					happiness: 100, hunger: 100,
 					outfit: {
 						hat: {
@@ -47,35 +52,35 @@ export default {
 					}
 				},
 				{
-					name: 'Ellie de Scheve', active: true, sleepiness: 7, speed: 5, size: 1, neediness: 10, appetite: 6,
+					name: 'Ellie de Scheve', active: true, sleepiness: 7, speed: 5, size: 1, neediness: 10, appetite: 6, stubbornness: 6,
 					happiness: 100, hunger: 100,
 					outfit: {
 						hat: ''
 					}
 				},
 				{
-					name: 'TomTomTommie', active: true, sleepiness: 4, speed: 8, size: 1, neediness: 10, appetite: 9,
+					name: 'TomTomTommie', active: true, sleepiness: 4, speed: 8, size: 1, neediness: 10, appetite: 9, stubbornness: 4,
 					happiness: 100, hunger: 100,
 					outfit: {
 						hat: ''
 					}
 				},
 				{
-					name: 'Pietertje', active: true, sleepiness: 3, speed: 4, size: 1, neediness: 4, appetite: 4,
+					name: 'Pietertje', active: true, sleepiness: 3, speed: 4, size: 1, neediness: 4, appetite: 4, stubbornness: 2,
 					happiness: 100, hunger: 100,
 					outfit: {
 						hat: ''
 					}
 				},
 				{
-					name: 'SUPERAnna', active: true, sleepiness: 10, speed: 3, size: 2, neediness: 1, appetite: 2,
+					name: 'SUPERAnna', active: true, sleepiness: 10, speed: 3, size: 2, neediness: 1, appetite: 2, stubbornness: 1,
 					happiness: 100, hunger: 100,
 					outfit: {
 						hat: ''
 					}
 				},
 				{
-					name: 'Jochem', active: true, sleepiness: 0, speed: 3, size: 2, neediness: 10, appetite: 8,
+					name: 'Jochem', active: true, sleepiness: 0, speed: 3, size: 2, neediness: 10, appetite: 8, stubbornness: 9,
 					happiness: 100, hunger: 100,
 					outfit: {
 						hat: '',
@@ -97,24 +102,21 @@ export default {
 			})
 		},
 		modifyStats(type, amount, name) {
+			let affectedCows = this.cows
 			if (name) {
-				let cow = this.cows.find((cow) => { return cow.name == name })
-				if (!cow) return
-				if (type == 'happiness') cow.happiness += amount
-				else if (type == 'hunger') cow.hunger += amount
-			} else {
-				this.cows.forEach((cow) => {
-					if (type == 'happiness') cow.happiness += amount
-					else if (type == 'hunger') cow.hunger += amount
-				})
+				affectedCows = affectedCows.filter((cow) => { return cow.name == name })
 			}
+			affectedCows.forEach((cow) => {
+				if (type == 'happiness') cow.happiness = Math.min(100, cow.happiness + amount)
+				else if (type == 'hunger') cow.hunger = Math.min(100, cow.hunger + amount)
+			})
 		}
 	},
 	mounted () {
 		this.startDepletions()
 		this.cows.forEach((cow) => {
-			cow.happiness = 100
-			cow.hunger = 10
+			cow.happiness = 80
+			cow.hunger = 80
 		})
 	}
 }
