@@ -1,6 +1,6 @@
 <template>
   <div id="display">
-		<Tamagotchi class ="tamagotchi"
+		<Tamagotchi
 			v-for="cow in activeCows"
 			@modifyStats="modifyStats"
 			:key="cow.name"

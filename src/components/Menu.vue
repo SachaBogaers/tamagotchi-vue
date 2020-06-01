@@ -1,6 +1,6 @@
 <template>
   <div id="menu">
-		<button type="button">Salto</button>
+		<button @click="salto" type="button">Salto</button>
 		<button @click="hug" type="button">Hug</button>
 		<button @click="feed" type="button">Feed</button>
 		<button @click="jump" type="button">Jump</button>
@@ -29,6 +29,9 @@ export default {
 		},
 		jump () {
 			this.$root.$emit('jump')
+		},
+		salto () {
+			this.$root.$emit('salto')
 		}
 	},
 	computed: {

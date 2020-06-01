@@ -9,7 +9,8 @@
 			<div
 				@click="petCow"  
 				class="tamagotchi__display__cow"
-				:class="{'tamagotchi__display__cow--jumping': jumping}"
+				:class="{'tamagotchi__display__cow--jumping': jumping,
+				'tamagotchi__display__cow--saltoing': saltoing}"
 				:style="{'animation-duration': animationDuration + 's'}">
 				<img
 					class="tamagotchi__display__img" 
@@ -24,6 +25,7 @@
 		<p>Hunger: {{hunger}}</p>
 		<button @click="feedCow" type="button">Feed</button>
 		<button @click="hugCow" type="button">Hug</button>
+		<button @click="salto" type="button">salto</button>
 	</div>
 </template>
 
@@ -49,7 +51,8 @@ export default {
 			y: 80*Math.random(),
 			direction: 'left',
 			walking: false,
-			jumping: false
+			jumping: false,
+			saltoing: false
 		}
 	},
 	watch: {
@@ -71,7 +74,7 @@ export default {
 			this.$emit('modifyStats', 'hunger', 10, this.name)
 		},
 		walk () {
-			if (this.status != 'dead') {
+			if (this.status != 'dead' && !this.saltoing) {
 				let range = 2*this.speed + 5
 				let x = this.x + (2 * range * Math.random() - range)
 				x = Math.max(0, x)
@@ -95,7 +98,13 @@ export default {
 		jump () {
 			if (!this.jumping && this.status != 'dead') {
 				this.jumping = true
-				setTimeout(() => this.jumping = false, 2 * this.animationDuration * 1000)
+				setTimeout(() => this.jumping = false, this.animationDuration * 1000)
+			}
+		},
+		salto () {
+			if (!this.saltoing && !this.jumping && this.status != 'dead') {
+				this.saltoing = true
+				setTimeout(() => this.saltoing = false, this.animationDuration * 1000)
 			}
 		},
 		walkGsap () {
@@ -146,7 +155,9 @@ export default {
 		animationDuration () {
 			let animationDuration = 0
 			if (this.jumping) {
-				animationDuration = 0.2
+				animationDuration = 0.4
+			} else if (this.saltoing) {
+				animationDuration = 1
 			} else {
 				if (this.walking) animationDuration = this.status == 'sad' ? 0.2 : 0.1
 				else if (!['dead', 'sad'].includes(this.status)) animationDuration = 0.5
@@ -157,6 +168,7 @@ export default {
 	mounted () {
 		setTimeout(this.walk, Math.random()*3000 + 2000)
 		this.$root.$on('jump', this.jump)
+		this.$root.$on('salto', this.salto)
 	}
 }
 </script>
@@ -169,8 +181,7 @@ export default {
 	font-weight: 700;
 }
 	.tamagotchi__display {
-		/* height: 300px;
-		width: 500px; */
+		position: relative;
 	}
 		.tamagotchi__display--flipped {
 			transform: scaleX(-1);
@@ -187,7 +198,10 @@ export default {
 			left: calc(100% * (3 / 24));
 		}
 		.tamagotchi__display__cow--jumping {
-			animation: jump 1s 2 alternate;
+			animation: jump;
+		}
+		.tamagotchi__display__cow--saltoing {
+			animation: salto;
 		}
 		.tamagotchi__display__img {
 			display: block;
@@ -206,8 +220,23 @@ export default {
 	from {
 		transform: translateY(0px);
 	}
-	to {
+	50% {
 		transform: translateY(-50px);
+	}
+	to {
+		transform: translateY(0px);
+	}
+}
+
+@keyframes salto {
+	from {
+		transform: translateY(0);
+	}
+	25% {
+		transform: translateY(-100px) rotate(0deg);
+	}
+	100% {
+		transform: translateY(0) rotate(-360deg);
 	}
 }
 
