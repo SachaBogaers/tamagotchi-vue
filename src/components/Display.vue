@@ -8,6 +8,7 @@
 			:sleepiness="cow.sleepiness"
 			:speed="cow.speed"
 			:neediness="cow.neediness"
+			:stubbornness="cow.stubbornness"
 			:appetite="cow.appetite"
 			:outfit="cow.outfit"
 			:happiness="cow.happiness"
@@ -52,7 +53,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
 	position: absolute;
-	width: 100%;
+	width: 90%;
 	height: 90%;
 	background: url('../assets/grass.png');
 	top: 0;
