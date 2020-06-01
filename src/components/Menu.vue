@@ -3,7 +3,7 @@
 		<button type="button">Salto</button>
 		<button @click="hug" type="button">Hug</button>
 		<button @click="feed" type="button">Feed</button>
-		<button type="button">Jump</button>
+		<button @click="jump" type="button">Jump</button>
   </div>
 </template>
 
@@ -26,6 +26,9 @@ export default {
 		},
 		feed () {
 			this.$emit('modifyStats', 'hunger', 10)
+		},
+		jump () {
+			this.$root.$emit('jump')
 		}
 	},
 	computed: {

@@ -9,8 +9,8 @@
 			<div
 				@click="petCow"  
 				class="tamagotchi__display__cow"
-				:class="{'tamagotchi__display__cow--walking': walking}"
-				:style="{'animation-duration': bounceSpeed + 's'}">
+				:class="{'tamagotchi__display__cow--jumping': jumping}"
+				:style="{'animation-duration': animationDuration + 's'}">
 				<img
 					class="tamagotchi__display__img" 
 					:src="image"/>
@@ -49,6 +49,7 @@ export default {
 			y: 80*Math.random(),
 			direction: 'left',
 			walking: false,
+			jumping: false
 		}
 	},
 	watch: {
@@ -64,6 +65,7 @@ export default {
 		},
 		hugCow() {
 			this.$emit('modifyStats', 'happiness', 10, this.name)
+			this.jump()
 		},
 		feedCow() {
 			this.$emit('modifyStats', 'hunger', 10, this.name)
@@ -89,6 +91,12 @@ export default {
 				setTimeout(() => this.walking = false, 2000)
 			}
 			setTimeout(this.walk, (this.sleepiness*1000)*Math.random() + 2000)
+		},
+		jump () {
+			if (!this.jumping && this.status != 'dead') {
+				this.jumping = true
+				setTimeout(() => this.jumping = false, 2 * this.animationDuration * 1000)
+			}
 		},
 		walkGsap () {
 		const { tamagotchi } = this.$refs
@@ -135,15 +143,20 @@ export default {
 			let image = require('../assets/glasses/' + image_name + '.png')
 			return image
 		},
-		bounceSpeed () {
-			let bounceSpeed = 0
-			if (this.walking) bounceSpeed = this.status == 'sad' ? 0.2 : 0.1
-			else if (!['dead', 'sad'].includes(this.status)) bounceSpeed = 0.5
-			return bounceSpeed
+		animationDuration () {
+			let animationDuration = 0
+			if (this.jumping) {
+				animationDuration = 0.2
+			} else {
+				if (this.walking) animationDuration = this.status == 'sad' ? 0.2 : 0.1
+				else if (!['dead', 'sad'].includes(this.status)) animationDuration = 0.5
+			}
+			return animationDuration
 		}
 	},
 	mounted () {
 		setTimeout(this.walk, Math.random()*3000 + 2000)
+		this.$root.$on('jump', this.jump)
 	}
 }
 </script>
@@ -173,8 +186,8 @@ export default {
 			top: calc(100% * (4 / 15));
 			left: calc(100% * (3 / 24));
 		}
-		.tamagotchi__display__cow--walking {
-			/* animation: bounce 0.2s infinite alternate; */
+		.tamagotchi__display__cow--jumping {
+			animation: jump 1s 2 alternate;
 		}
 		.tamagotchi__display__img {
 			display: block;
@@ -186,6 +199,15 @@ export default {
 	}
 	to {
 		transform: translateY(-3px);
+	}
+}
+
+@keyframes jump {
+	from {
+		transform: translateY(0px);
+	}
+	to {
+		transform: translateY(-50px);
 	}
 }
 
