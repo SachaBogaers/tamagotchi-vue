@@ -9,25 +9,34 @@
 			<div
 				@click="petCow"  
 				class="tamagotchi__display__cow"
-				:class="{'tamagotchi__display__cow--jumping': jumping,
-				'tamagotchi__display__cow--somersaulting': somersaulting}"
+				:class="{
+					'tamagotchi__display__cow--jumping': jumping,
+					'tamagotchi__display__cow--somersaulting': somersaulting,
+					'tamagotchi__display__cow--dead': status == 'dead'
+				}"
 				:style="{'animation-duration': animationDuration + 's'}">
 				<img
-					class="tamagotchi__display__img" 
-					:src="image"/>
-				<img v-if="outfit.hat" class="outfit hat" :src="hatImage" :style="hatLocation"/>
-				<img v-if="outfit.glasses" class="outfit glasses" :src="glassesImage"/>
+					class="tamagotchi__display__base" 
+					:src="baseImage"/>
+				<img v-if="outfit.shirt" class="outfit shirt" :src="outfitImage(outfit.shirt)" :style="outfitLocation(outfit.shirt)"/>
+				<div class="tamagotchi__display__head" :style="headLocation">
+					<img :src="headImage" class="tamagotchi__display__head__base"/>
+					<img v-if="outfit.glasses" class="outfit glasses" :src="outfitImage(outfit.glasses)" :style="outfitLocation(outfit.glasses)"/>
+					<img v-if="outfit.hat" class="outfit hat" :src="outfitImage(outfit.hat)" :style="outfitLocation(outfit.hat)"/>
+				</div>
 			</div>
 		</div>
 		<p>{{name}}</p>
 		<button @click="feedCow" type="button">Feed</button>
 		<button @click="hugCow" type="button">Hug</button>
 		<button @click="somersault" type="button">Somersault</button>
+		<button @click="strip" type="button">Strip</button>
 	</div>
 </template>
 
 <script>
 import { gsap } from 'gsap'
+require("@/assets/hat/cowboy.png")
 
 export default {
 	props: {
@@ -60,7 +69,7 @@ export default {
 		// watch cow's energy
 		'energy': function () {
 			// make cow sleep when energy reaches 0
-			if (this.energy == 0 && this.action != 'sleeping') {
+			if (this.energy == 0 && this.action != 'sleeping' && this.status != 'dead') {
 				this.sleep()
 			}
 		},
@@ -69,20 +78,20 @@ export default {
 			// avoid that cow starts this function when sleeping or when already moving or eating
 			if (this.hunger <= 40 && !['sleeping', 'moving_to', 'eating'].includes(this.action)) {
 				// filter apples out of list of items
-				let apples = this.items.filter((item) => { return (item.name == 'apple' && !item.reserved) })
-				// no apples means no eating
-				if (apples.length == 0) return
+				let foodItems = this.items.filter((item) => { return (item.class == 'food' && !item.reserved) })
+				// no food means no eating
+				if (foodItems.length == 0) return
 				// select random apple
-				let apple = apples[Math.floor(Math.random() * apples.length)]
+				let foodItem = foodItems[Math.floor(Math.random() * foodItems.length)]
 				let cow_height = 10 // In percentage of total height
 				// move to selected apple
-				this.move(apple.left, apple.top - cow_height)
+				this.move(foodItem.left, foodItem.top - cow_height)
 				this.action = 'moving_to'
 				// make sure item gets reserved so other cows don't walk towards it
-				this.$emit('reserveItem', apple.id)
+				this.$emit('reserveItem', foodItem.id)
 				let move_duration = 2
 				// call eat function once cow has reached destination
-				setTimeout(() => this.eat(apple), move_duration * 1000)
+				setTimeout(() => this.eat(foodItem), move_duration * 1000)
 			}
 		}
 	},
@@ -107,6 +116,8 @@ export default {
 					this.$emit('modifyStats', 'hunger', food.foodValue, this.name)
 					this.$emit('removeItem', food.id)
 				}, 2000)
+			} else {
+				this.$emit('reserveItem', food.id, false)
 			}
 		},
 		walk () {
@@ -139,9 +150,12 @@ export default {
 		jump (costsEnergy=true) {
 			if (!this.jumping && this.status != 'dead' && !['sleeping'].includes(this.action)) {
 				if (this.listens()) {
+					let jumpEnergy = 5
+					let jumpHunger = 10
+					if (costsEnergy && this.hunger <= jumpHunger) return
 					this.jumping = true
-					if (costsEnergy) this.$emit('modifyStats', 'energy', -5, this.name)
-					if (costsEnergy) this.$emit('modifyStats', 'hunger', -10, this.name)
+					if (costsEnergy) this.$emit('modifyStats', 'energy', -jumpEnergy, this.name)
+					if (costsEnergy) this.$emit('modifyStats', 'hunger', -jumpHunger, this.name)
 					setTimeout(() => this.jumping = false, this.animationDuration * 1000)
 				}
 			}
@@ -165,12 +179,30 @@ export default {
 				}
 			}, 150 + this.personality.sleepiness * 25)
 		},
+		strip () {
+			this.$root.$emit('strip', this.name)
+		},
 		walkGsap () {
 		const { tamagotchi } = this.$refs
 		gsap.to(tamagotchi, {repeat: -1, delay: this.personality.sleepiness, duration: 11 - this.personality.speed, left: "+=random(-20, 20)%" , top: '+=random(-20, 20)%', repeatRefresh: true})
 		},
 		listens () {
 			return Math.random() < this.listenProbability
+		},
+		outfitLocation (item) {
+			let leftPixels = this.outfit[item.class].left
+			let topPixels = this.outfit[item.class].top
+			if (item.class == 'shirt' && this.action == 'sleeping') topPixels += 2
+			let outfitLocation = {
+				left: 'calc(100% * (' + leftPixels + '/24))',
+				top: 'calc(100% * (' + topPixels + '/15))'
+			}
+			return outfitLocation
+		},
+		outfitImage (item) {
+			let imageName = this.outfit[item.class].name
+			let image = require('../assets/' + item.class + '/' + imageName + '.png')
+			return image
 		}
 	},
 	computed: {
@@ -198,31 +230,26 @@ export default {
 			}
 			return status
 		},
-		image () {
-			let image_name = this.status
-			if (this.status == 'dead') image_name = 'dead'
-			else if (this.action == 'sleeping') image_name = 'sleeping'
-			else if (this.action == 'eating') image_name = 'eating'
-			image_name += 'Cow'
+		baseImage () {
+			let image_name = 'standard'
+			if (this.action == 'sleeping') image_name = 'sleeping'
+			image_name += 'Base'
 			let image = require('../assets/' + image_name + '.png')
 			return image
 		},
-		hatImage () {
-			let image_name = this.outfit.hat.name
-			let image = require('../assets/hats/' + image_name + '.png')
+		headImage () {
+			let image_name = this.status
+			if (this.status == 'dead') image_name = 'dead'
+			else if (this.action == 'sleeping') image_name = 'sleeping'
+			image_name += 'Head'
+			let image = require('../assets/' + image_name + '.png')
 			return image
 		},
-		hatLocation () {
-			let hatLocation = {
-				left: 'calc(100% * (' + this.outfit.hat.left + '/24))',
-				top: 'calc(100% * (' + this.outfit.hat.top + '/15))'
-			}
-			return hatLocation
-		},
-		glassesImage () {
-			let image_name = this.outfit.glasses
-			let image = require('../assets/glasses/' + image_name + '.png')
-			return image
+		headLocation () {
+			let left, top = 0
+			if (this.action == 'sleeping') top = 'calc(100% * (2/15))'
+			else if (this.action == 'eating') top = 'calc(100% * (3/15))'
+			return { left, top }
 		},
 		animationDuration () {
 			let animationDuration = 0
@@ -274,12 +301,11 @@ export default {
 		animation: bounce infinite alternate;
 		position: relative;
 	}
+		.tamagotchi__display__cow--dead {
+			transform: scaleY(-1);
+		}
 		.tamagotchi__display__cow .outfit{
 			position: absolute;
-		}
-		.tamagotchi__display__cow .glasses {
-			top: calc(100% * (4 / 15));
-			left: calc(100% * (3 / 24));
 		}
 		.tamagotchi__display__cow--jumping {
 			animation: jump;
@@ -287,9 +313,16 @@ export default {
 		.tamagotchi__display__cow--somersaulting {
 			animation: somersault;
 		}
-		.tamagotchi__display__img {
+		.tamagotchi__display__base {
 			display: block;
 		}
+		.tamagotchi__display__head {
+			position: absolute;
+			display: block;
+		}
+			.tamagotchi__display__head__base {
+				display: block;
+			}
 
 @keyframes bounce {
 	from {

@@ -29,17 +29,12 @@ export default {
 	data () {
 		return {
 			appSpeed: 0, // Must be in [0, 2).
+			itemsMenu: false,
 			cows: [
 				{
 					name: 'Cowboy Billy Boem', active: true, size: 1,
 					happiness: 100, hunger: 100, energy: 100,
-					outfit: {
-						hat: {
-							name: 'cowboy',
-							left: '-1',
-							top: '-5'
-						}
-					},
+					outfit: {},
 					personality: {
 						fitness: 7,
 						neediness: 2,
@@ -52,14 +47,7 @@ export default {
 				{
 					name: 'Mawiefje', active: true, size: 1,
 					happiness: 100, hunger: 100, energy: 100,
-					outfit: {
-						hat: {
-							name: 'cowboy',
-							left: '-1',
-							top: '-5'
-						},
-						glasses: 'sunglasses'
-					},
+					outfit: {},
 					personality: {
 						fitness: 9,
 						neediness: 8,
@@ -72,9 +60,7 @@ export default {
 				{
 					name: 'Ellie de Scheve', active: true, size: 1,
 					happiness: 100, hunger: 100, energy: 100,
-					outfit: {
-						hat: ''
-					},
+					outfit: {},
 					personality: {
 						fitness: 4,
 						neediness: 10,
@@ -87,9 +73,7 @@ export default {
 				{
 					name: 'TomTomTommie', active: true, size: 1,
 					happiness: 100, hunger: 100, energy: 100,
-					outfit: {
-						hat: ''
-					},
+					outfit: {},
 					personality: {
 						fitness: 6,
 						neediness: 10,
@@ -102,9 +86,7 @@ export default {
 				{
 					name: 'Pietertje', active: true, size: 1,
 					happiness: 100, hunger: 100, energy: 100,
-					outfit: {
-						hat: ''
-					},
+					outfit: {},
 					personality: {
 						fitness: 4,
 						neediness: 4,
@@ -117,9 +99,7 @@ export default {
 				{
 					name: 'SUPERAnna', active: true, size: 2,
 					happiness: 100, hunger: 100, energy: 100,
-					outfit: {
-						hat: ''
-					},
+					outfit: {},
 					personality: {
 						fitness: 3,
 						neediness: 1,
@@ -132,10 +112,7 @@ export default {
 				{
 					name: 'Jochem', active: true, size: 2,
 					happiness: 100, hunger: 100, energy: 100,
-					outfit: {
-						hat: '',
-						glasses: 'sunglasses'
-					},
+					outfit: {},
 					personality: {
 						fitness: 10,
 						neediness: 10,
@@ -168,10 +145,22 @@ export default {
 				affectedCows = affectedCows.filter((cow) => { return cow.name == name })
 			}
 			affectedCows.forEach((cow) => {
-				if (type == 'happiness') cow.happiness = Math.max(0, Math.min(100, cow.happiness + amount))
-				else if (type == 'hunger') cow.hunger = Math.max(0, Math.min(100, cow.hunger + amount))
-				else if (type == 'energy') cow.energy = Math.max(0, Math.min(100, cow.energy + amount))
+				cow[type] = Math.max(0, Math.min(100, cow[type] + amount))
 			})
+		},
+		giveOutfit(item) {
+			let cows = this.cows.filter((cow) => {
+				if (!cow.outfit[item.class]) return true
+				else return false
+			})
+			let cow = cows[Math.floor(Math.random() * cows.length)]
+			if (!cow) return
+			const newOutfit = { ...item }
+			cow.outfit[item.class] = newOutfit
+		},
+		strip (cowName) {
+				let cow = this.cows.find((cow) => { return cow.name == cowName })
+				cow.outfit = {}
 		}
 	},
 	computed: {
@@ -186,6 +175,8 @@ export default {
 			cow.hunger = 80
 			cow.energy = 80
 		})
+		this.$root.$on('giveOutfit', this.giveOutfit)
+		this.$root.$on('strip', this.strip)
 	}
 }
 </script>

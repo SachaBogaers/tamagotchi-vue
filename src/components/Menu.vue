@@ -5,28 +5,29 @@
 		<button class="button" @click="feed" type="button">Feed</button>
 		<button class="button" @click="jump" type="button">Jump</button>
 		<button class="button" @click="coffee" type="button">Give coffee (cost: 3)</button>
-		<button class="button" @click="placeApple" type="button">Place apple (cost: 5)</button>
+		<button class="button items-button" @click="openItemsMenu" type="button">Open items menu</button>
 		<div class="wallet">
 			<p>Coins:{{money}}</p>
 		</div>
+		<ItemsMenu v-show="itemsMenuOpen" :money="money" @spend="spend"/>
   </div>
 </template>
 
 <script>
-
+import ItemsMenu from './ItemsMenu.vue'
 
 export default {
   name: 'Menu',
   components: {
-		
+		ItemsMenu
 	},
 	props: {
 		delayCoefficient: Number
 	},
 	data () {
 		return {
-			money: 0
-			
+			money: 0,
+			itemsMenuOpen: false
 		}
 	},
 	methods: {
@@ -37,14 +38,7 @@ export default {
 			this.$emit('modifyStats', 'hunger', 10)
 		},
 		coffee () {
-			if (this.spend(3)) {
-				this.$emit('modifyStats', 'energy', 5)
-			}
-		},
-		placeApple (){
-			if (this.spend(5)) {
-				this.$root.$emit('placeApple')
-			}
+			this.$emit('modifyStats', 'energy', 5)
 		},
 		jump () {
 			this.$root.$emit('jump')
@@ -53,13 +47,10 @@ export default {
 			this.$root.$emit('somersault')
 		},
 		spend (cost) {
-			if (this.money < cost) {
-				alert('U HAVE NO MONNIE')
-				return false
-			} else {
-				this.money -= cost
-				return true
-			}
+			this.money -= cost
+		},
+		openItemsMenu() {
+			this.itemsMenuOpen = !this.itemsMenuOpen
 		}
 	},
 	computed: {
@@ -86,14 +77,20 @@ export default {
 .button {
 	padding: 15px;
 	margin: 10px;
+	cursor: pointer;
 }
 
 .wallet {
 	position: absolute;
 	right: 0;
-	top: 10%;
+	top: 30%;
 	background-color: yellow;
-	padding: 15px;
+	padding: 5px;
+}
+
+.items-button {
+	position: absolute;
+	right: 15%;
 }
 
 </style>

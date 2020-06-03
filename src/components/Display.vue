@@ -4,7 +4,7 @@
 			class="item"
 			v-for="(item, index) in items"
 			:key="'item' + index"
-			:src="item_image(item.name)"
+			:src="itemImage(item.class, item.name)"
 			:style="{left: item.left + '%', top: item.top + '%'}">
 		<Tamagotchi
 			v-for="cow in activeCows"
@@ -45,8 +45,8 @@ export default {
 		modifyStats(type, amount, name) {
 			this.$emit('modifyStats', type, amount, name)
 		},
-		item_image (item_name) {
-			let image = require('@/assets/items/' + item_name + '.png')
+		itemImage (itemClass, itemName) {
+			let image = require('@/assets/' + itemClass + '/' + itemName + '.png')
 			return image
 		},
 		addItem (item) {
@@ -54,20 +54,15 @@ export default {
 			this.itemId++
 			this.items.push(item)
 		},
-		placeApple () {
-			const left = Math.random() * 95
-			const top = Math.random() * 95
-			let apple = {
-				'name': 'apple',
-				'left': left,
-				'top': top,
-				'foodValue': 30
-			}
-			this.addItem(apple)
+		placeItem (item) {
+			let newItem = { ...item }
+			newItem['left'] = Math.random() * 95
+			newItem['top'] = Math.random() * 95
+			this.addItem(newItem)
 		},
-		reserveItem (itemId) {
+		reserveItem (itemId, reserve=true) {
 			let item = this.items.find((item) => item.id == itemId)
-			item.reserved = true
+			item.reserved = reserve
 		},
 		removeItem (itemId) {
 			this.items = this.items.filter((item) => item.id != itemId)
@@ -80,12 +75,12 @@ export default {
 		}
 	},
 	mounted () {
-		this.$root.$on('placeApple', this.placeApple)
+		this.$root.$on('placeItem', this.placeItem)
 	}
 }
 </script>
 
-<style>
+<style scoped>
 #display {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -97,9 +92,8 @@ export default {
 	top: 0;
 	overflow: hidden;
 }
-
-.item {
-	position: absolute;
-}
+	.item {
+		position: absolute;
+	}
 
 </style>
