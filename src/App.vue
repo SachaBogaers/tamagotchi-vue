@@ -31,7 +31,7 @@ export default {
 			appSpeed: 0, // Must be in [0, 2).
 			cows: [
 				{
-					name: 'Cowboy Billy Boem', active: true, sleepiness: 5, size: 1, appetite: 7, stubbornness: 7,
+					name: 'Cowboy Billy Boem', active: true, size: 1,
 					happiness: 100, hunger: 100, energy: 100,
 					outfit: {
 						hat: {
@@ -43,11 +43,14 @@ export default {
 					personality: {
 						fitness: 7,
 						neediness: 2,
-						speed: 5
+						speed: 5,
+						stubbornness: 7,
+						appetite: 7,
+						sleepiness: 5
 					}
 				},
 				{
-					name: 'Mawiefje', active: true, sleepiness: 1, size: 1, appetite: 10, stubbornness: 10,
+					name: 'Mawiefje', active: true, size: 1,
 					happiness: 100, hunger: 100, energy: 100,
 					outfit: {
 						hat: {
@@ -60,11 +63,14 @@ export default {
 					personality: {
 						fitness: 9,
 						neediness: 8,
-						speed: 10
+						speed: 10,
+						stubbornness: 10,
+						appetite: 10,
+						sleepiness: 1
 					}
 				},
 				{
-					name: 'Ellie de Scheve', active: true, sleepiness: 7, size: 1, appetite: 6, stubbornness: 6,
+					name: 'Ellie de Scheve', active: true, size: 1,
 					happiness: 100, hunger: 100, energy: 100,
 					outfit: {
 						hat: ''
@@ -72,11 +78,14 @@ export default {
 					personality: {
 						fitness: 4,
 						neediness: 10,
-						speed: 5
+						speed: 5,
+						stubbornness: 6,
+						appetite: 6,
+						sleepiness: 7
 					}
 				},
 				{
-					name: 'TomTomTommie', active: true, sleepiness: 4, size: 1, appetite: 9, stubbornness: 4,
+					name: 'TomTomTommie', active: true, size: 1,
 					happiness: 100, hunger: 100, energy: 100,
 					outfit: {
 						hat: ''
@@ -84,11 +93,14 @@ export default {
 					personality: {
 						fitness: 6,
 						neediness: 10,
-						speed: 8
+						speed: 8,
+						stubbornness: 4,
+						appetite: 9,
+						sleepiness: 4
 					}
 				},
 				{
-					name: 'Pietertje', active: true, sleepiness: 3, size: 1, appetite: 4, stubbornness: 2,
+					name: 'Pietertje', active: true, size: 1,
 					happiness: 100, hunger: 100, energy: 100,
 					outfit: {
 						hat: ''
@@ -96,11 +108,14 @@ export default {
 					personality: {
 						fitness: 4,
 						neediness: 4,
-						speed: 4
+						speed: 4,
+						stubbornness: 2,
+						appetite: 4,
+						sleepiness: 3
 					}
 				},
 				{
-					name: 'SUPERAnna', active: true, sleepiness: 10, size: 2, appetite: 2, stubbornness: 1,
+					name: 'SUPERAnna', active: true, size: 2,
 					happiness: 100, hunger: 100, energy: 100,
 					outfit: {
 						hat: ''
@@ -108,11 +123,14 @@ export default {
 					personality: {
 						fitness: 3,
 						neediness: 1,
-						speed: 3
+						speed: 3,
+						stubbornness: 1,
+						appetite: 2,
+						sleepiness: 10
 					}
 				},
 				{
-					name: 'Jochem', active: true, sleepiness: 1, size: 2, appetite: 8, stubbornness: 9,
+					name: 'Jochem', active: true, size: 2,
 					happiness: 100, hunger: 100, energy: 100,
 					outfit: {
 						hat: '',
@@ -121,7 +139,10 @@ export default {
 					personality: {
 						fitness: 10,
 						neediness: 10,
-						speed: 3
+						speed: 3,
+						stubbornness: 9,
+						appetite: 8,
+						sleepiness: 1
 					}
 				}
 			],
@@ -135,7 +156,7 @@ export default {
 				}, this.delayCoefficient * (1000 + (11 - cow.personality.neediness) * 300))
 				setInterval(() => {
 					cow.hunger = Math.max(0, cow.hunger - 1)
-				}, this.delayCoefficient * (1000 + (11 - cow.appetite) * 400))
+				}, this.delayCoefficient * (1000 + (11 - cow.personality.appetite) * 400))
 				setInterval(() => {
 					cow.energy = Math.max(0, cow.energy-1)
 				}, this.delayCoefficient * (1000 + cow.personality.fitness * 400))

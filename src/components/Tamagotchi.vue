@@ -10,7 +10,7 @@
 				@click="petCow"  
 				class="tamagotchi__display__cow"
 				:class="{'tamagotchi__display__cow--jumping': jumping,
-				'tamagotchi__display__cow--saltoing': saltoing}"
+				'tamagotchi__display__cow--somersaulting': somersaulting}"
 				:style="{'animation-duration': animationDuration + 's'}">
 				<img
 					class="tamagotchi__display__img" 
@@ -22,7 +22,7 @@
 		<p>{{name}}</p>
 		<button @click="feedCow" type="button">Feed</button>
 		<button @click="hugCow" type="button">Hug</button>
-		<button @click="salto" type="button">Salto</button>
+		<button @click="somersault" type="button">Somersault</button>
 	</div>
 </template>
 
@@ -32,9 +32,6 @@ import { gsap } from 'gsap'
 export default {
 	props: {
 		name: String,
-		sleepiness: Number,
-		appetite: Number,
-		stubbornness: Number,
 		outfit: Object,
 		happiness: Number,
 		hunger: Number,
@@ -44,38 +41,47 @@ export default {
 	},
 	data () {
 		return {
-			// left: 50,
-			// top: 50,
 			x: 80*Math.random(),
 			y: 80*Math.random(),
 			direction: 'left',
 			walking: false,
 			jumping: false,
-			saltoing: false,
+			somersaulting: false,
 			action: ''
 		}
 	},
 	watch: {
+		// make sure cow stops walking when dead
 		'status': function () {
 			if (this.status == 'dead') {
 				this.walking = false
 			}
 		},
+		// watch cow's energy
 		'energy': function () {
+			// make cow sleep when energy reaches 0
 			if (this.energy == 0 && this.action != 'sleeping') {
 				this.sleep()
 			}
 		},
+		// watch cow's hunger
 		'hunger': function() {
+			// avoid that cow starts this function when sleeping or when already moving or eating
 			if (this.hunger <= 40 && !['sleeping', 'moving_to', 'eating'].includes(this.action)) {
+				// filter apples out of list of items
 				let apples = this.items.filter((item) => { return (item.name == 'apple' && !item.reserved) })
+				// no apples means no eating
 				if (apples.length == 0) return
+				// select random apple
 				let apple = apples[Math.floor(Math.random() * apples.length)]
-				let cow_height = 10 // In percentage of total heigh
+				let cow_height = 10 // In percentage of total height
+				// move to selected apple
 				this.move(apple.left, apple.top - cow_height)
 				this.action = 'moving_to'
+				// make sure item gets reserved so other cows don't walk towards it
 				this.$emit('reserveItem', apple.id)
 				let move_duration = 2
+				// call eat function once cow has reached destination
 				setTimeout(() => this.eat(apple), move_duration * 1000)
 			}
 		}
@@ -105,7 +111,7 @@ export default {
 		},
 		walk () {
 			if (this.status != 'dead'
-			&& !this.saltoing
+			&& !this.somersaulting
 			&& !['sleeping', 'moving_to', 'eating'].includes(this.action)) {
 				let range = 2*this.personality.speed + 5
 				let x = this.x + (2 * range * Math.random() - range)
@@ -116,7 +122,7 @@ export default {
 				y = Math.min(80, y)
 				this.move(x, y)
 			}
-			setTimeout(this.walk, (this.sleepiness*1000)*Math.random() + 2000)
+			setTimeout(this.walk, (this.personality.sleepiness*1000)*Math.random() + 2000)
 		},
 		move (x, y) {
 			if (x > this.x) {
@@ -140,12 +146,12 @@ export default {
 				}
 			}
 		},
-		salto () {
-			if (!this.saltoing && !this.jumping && this.status != 'dead' && !['sleeping'].includes(this.action)) {
+		somersault () {
+			if (!this.somersaulting && !this.jumping && this.status != 'dead' && !['sleeping'].includes(this.action)) {
 				if (this.listens()) {
-					this.saltoing = true
+					this.somersaulting = true
 					this.$emit('modifyStats', 'energy', -10, this.name)
-					setTimeout(() => this.saltoing = false, this.animationDuration * 1000)
+					setTimeout(() => this.somersaulting = false, this.animationDuration * 1000)
 				}
 			}
 		},
@@ -157,11 +163,11 @@ export default {
 					this.action = ''
 					clearInterval(sleepInterval)
 				}
-			}, 150 + this.sleepiness * 25)
+			}, 150 + this.personality.sleepiness * 25)
 		},
 		walkGsap () {
 		const { tamagotchi } = this.$refs
-		gsap.to(tamagotchi, {repeat: -1, delay: this.sleepiness, duration: 11 - this.personality.speed, left: "+=random(-20, 20)%" , top: '+=random(-20, 20)%', repeatRefresh: true})
+		gsap.to(tamagotchi, {repeat: -1, delay: this.personality.sleepiness, duration: 11 - this.personality.speed, left: "+=random(-20, 20)%" , top: '+=random(-20, 20)%', repeatRefresh: true})
 		},
 		listens () {
 			return Math.random() < this.listenProbability
@@ -224,7 +230,7 @@ export default {
 				return animationDuration
 			if (this.jumping) {
 				animationDuration = 0.4
-			} else if (this.saltoing) {
+			} else if (this.somersaulting) {
 				animationDuration = 1
 			} else if (this.action == 'eating') {
 				animationDuration = 0.1
@@ -236,7 +242,7 @@ export default {
 		},
 		listenProbability () {
 			let statPercentage = (this.happiness + this.hunger) / 200
-			let listenProbability = (0.2 + 0.6 * statPercentage) + (0.8 - 0.6 * statPercentage) * (11 - this.stubbornness) / 10
+			let listenProbability = (0.2 + 0.6 * statPercentage) + (0.8 - 0.6 * statPercentage) * (11 - this.personality.stubbornness) / 10
 			// Round to two decimals
 			listenProbability = Math.round(listenProbability * 100) / 100
 			return listenProbability
@@ -245,7 +251,7 @@ export default {
 	mounted () {
 		setTimeout(this.walk, Math.random()*3000 + 2000)
 		this.$root.$on('jump', this.jump)
-		this.$root.$on('salto', this.salto)
+		this.$root.$on('somersault', this.somersault)
 	}
 }
 </script>
@@ -278,8 +284,8 @@ export default {
 		.tamagotchi__display__cow--jumping {
 			animation: jump;
 		}
-		.tamagotchi__display__cow--saltoing {
-			animation: salto;
+		.tamagotchi__display__cow--somersaulting {
+			animation: somersault;
 		}
 		.tamagotchi__display__img {
 			display: block;
@@ -306,7 +312,7 @@ export default {
 	}
 }
 
-@keyframes salto {
+@keyframes somersault {
 	from {
 		transform: translateY(0);
 	}

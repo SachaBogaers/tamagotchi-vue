@@ -1,6 +1,6 @@
 <template>
   <div id="menu">
-		<button class="button" @click="salto" type="button">Salto</button>
+		<button class="button" @click="somersault" type="button">Somersault</button>
 		<button class="button" @click="hug" type="button">Hug</button>
 		<button class="button" @click="feed" type="button">Feed</button>
 		<button class="button" @click="jump" type="button">Jump</button>
@@ -49,8 +49,8 @@ export default {
 		jump () {
 			this.$root.$emit('jump')
 		},
-		salto () {
-			this.$root.$emit('salto')
+		somersault () {
+			this.$root.$emit('somersault')
 		},
 		spend (cost) {
 			if (this.money < cost) {
