@@ -95,16 +95,17 @@ export default {
 			}
 		},
 		'happiness': function() {
-			// avoid that cow starts this function when sleeping or when already moving, eating or playing
-			let playItems = this.items.filter((item) => { return (item.class == 'gift' && !item.reserved)})
-			if (playItems.length > 0) {
-				let playItem = playItems[Math.floor(Math.random() * playItems.length)]
-				let cow_height = 10 // In percentage of total height
-				this.move(playItem.left, playItem.top - cow_height)
-				this.action = 'moving_to'
-				this.$emit('reserveItem', playItem.id)
-				let move_duration = 2
-				setTimeout(() => this.play(playItem), move_duration * 1000)
+			if (!['sleeping', 'moving_to', 'eating', 'playing' && status != 'dead'].includes(this.action)) {
+				let playItems = this.items.filter((item) => { return (item.class == 'gift' && !item.reserved)})
+				if (playItems.length > 0) {
+					let playItem = playItems[Math.floor(Math.random() * playItems.length)]
+					let cow_height = 10 // In percentage of total height
+					this.move(playItem.left, playItem.top - cow_height)
+					this.action = 'moving_to'
+					this.$emit('reserveItem', playItem.id)
+					let move_duration = 2
+					setTimeout(() => this.play(playItem), move_duration * 1000)
+				}
 			}
 		}
 	},
@@ -154,7 +155,7 @@ export default {
 		walk () {
 			if (this.status != 'dead'
 			&& !this.somersaulting
-			&& !['sleeping', 'moving_to', 'eating'].includes(this.action)) {
+			&& !['sleeping', 'moving_to', 'eating', 'playing'].includes(this.action)) {
 				let range = 2*this.personality.speed + 5
 				let x = this.x + (2 * range * Math.random() - range)
 				x = Math.max(0, x)
