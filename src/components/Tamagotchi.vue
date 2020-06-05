@@ -93,6 +93,19 @@ export default {
 				// call eat function once cow has reached destination
 				setTimeout(() => this.eat(foodItem), move_duration * 1000)
 			}
+		},
+		'happiness': function() {
+			// avoid that cow starts this function when sleeping or when already moving, eating or playing
+			let playItems = this.items.filter((item) => { return (item.class == 'gift' && !item.reserved)})
+			if (playItems.length > 0) {
+				let playItem = playItems[Math.floor(Math.random() * playItems.length)]
+				let cow_height = 10 // In percentage of total height
+				this.move(playItem.left, playItem.top - cow_height)
+				this.action = 'moving_to'
+				this.$emit('reserveItem', playItem.id)
+				let move_duration = 2
+				setTimeout(() => this.play(playItem), move_duration * 1000)
+			}
 		}
 	},
 	methods: {
@@ -114,10 +127,28 @@ export default {
 				setTimeout(() => {
 					this.action = ''
 					this.$emit('modifyStats', 'hunger', food.foodValue, this.name)
+					if (food.happinessValue) {
+						this.$emit('modifyStats', 'happiness', food.happinessValue, this.name)
+					}
 					this.$emit('removeItem', food.id)
 				}, 2000)
 			} else {
 				this.$emit('reserveItem', food.id, false)
+			}
+		},
+		play (gift) {
+			if (this.action == 'moving_to') this.action = ''
+			if (!['sleeping'].includes(this.action) && this.status != 'dead') {
+				this.action = 'playing'
+				this.direction = 'left'
+				this.jump(false)
+				setTimeout(() => {
+					this.action = ''
+					this.$emit('modifyStats', 'happiness', gift.happinessValue, this.name)
+					this.$emit('removeItem', gift.id)
+				}, 5000)
+			} else {
+				this.$emit('reserveItem', gift.id, false)
 			}
 		},
 		walk () {
@@ -259,7 +290,7 @@ export default {
 				animationDuration = 0.4
 			} else if (this.somersaulting) {
 				animationDuration = 1
-			} else if (this.action == 'eating') {
+			} else if (this.action == 'eating' || this.action == 'playing') {
 				animationDuration = 0.1
 			} else {
 				if (this.walking) animationDuration = this.status == 'sad' ? 0.2 : 0.1

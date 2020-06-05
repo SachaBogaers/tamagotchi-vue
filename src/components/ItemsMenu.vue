@@ -48,8 +48,25 @@ export default {
 							fullName: 'Pizza',
 							class: 'food',
 							foodValue: 50,
+							happinessValue: 15,
 							cost: 20
-						}
+						},
+						{
+							name: 'lemon',
+							fullName: 'Lemon',
+							class: 'food',
+							foodValue: 3,
+							happinessValue: -4,
+							cost: 2
+						},
+						{
+							name: 'donut',
+							fullName: 'Donut',
+							class: 'food',
+							foodValue: 14,
+							happinessValue: 10,
+							cost: 5
+						},
 					]
 				},
 				{
@@ -62,6 +79,14 @@ export default {
 							cost: 1,
 							left: -1,
 							top: -5
+						},
+						{
+							name: 'santa',
+							fullName: 'Santa Hat',
+							class: 'hat',
+							cost: 1,
+							left: 1,
+							top: -11
 						},
 					]
 				},
@@ -122,7 +147,32 @@ export default {
 							top: 0
 						},
 					]
-				}
+				},
+				{
+					'class': 'Gifts',
+					'items': [
+						{
+							name: 'gift1',
+							fullName: 'Mystery gift',
+							class: 'gift',
+							cost: 1,
+							happinessValue: 10
+						},
+						{
+							name: 'bowlingPin',
+							fullName: 'Bowling pin',
+							class: 'gift',
+							cost: 1,
+							happinessValue: 10
+						},						{
+							name: 'controllerP',
+							fullName: 'Playstation Controller',
+							class: 'gift',
+							cost: 1,
+							happinessValue: 10
+						},
+					]
+				},
 			]
 		}
 	},
@@ -135,7 +185,7 @@ export default {
 			if (this.money < item.cost) alert('U HAVE NO MONNIE')
 			else {
 				this.$emit('spend', item.cost)
-				if (item.class == 'food') {
+				if (item.class == 'food' || item.class == 'gift') {
 					this.$root.$emit('placeItem', item)
 				} else if (['hat', 'glasses', 'shirt'].includes(item.class)) {
 					this.$root.$emit('giveOutfit', item)

@@ -8,6 +8,14 @@
 			@modifyStats="modifyStats"
 			:delayCoefficient="delayCoefficient"
 		/>
+		<button :style="{position: 'absolute'}" @click="giveOutfit({
+							name: 'cowboy',
+							fullName: 'Cowboy Hat',
+							class: 'hat',
+							cost: 1,
+							left: -1,
+							top: -5
+						})">OUTFITTTTT</button>
 		<List 
 			:cows="cows"
 		/>
@@ -121,9 +129,25 @@ export default {
 						appetite: 8,
 						sleepiness: 1
 					}
+				},
+				{
+					name: 'Eefje Kubushoofd', active: true, size: 2,
+					happiness: 100, hunger: 100, energy: 100,
+					outfit: {},
+					personality: {
+						fitness: 6,
+						neediness: 10,
+						speed: 6,
+						stubbornness: 2,
+						appetite: 5,
+						sleepiness: 8
+					}
 				}
 			],
 		}
+	},
+	watch: {
+		
 	},
 	methods: {
 		startDepletions () {
@@ -166,7 +190,8 @@ export default {
 	computed: {
 		delayCoefficient () {
 			return 2 - this.appSpeed
-		}
+		},
+
 	},
 	mounted () {
 		this.startDepletions()
